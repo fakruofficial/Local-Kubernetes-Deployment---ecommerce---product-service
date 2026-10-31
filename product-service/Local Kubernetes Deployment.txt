@@ -1,0 +1,206 @@
+.Local Kubernetes Deployment(dont needto run your project in local to access this - http://localhost:8081/products)but docker kubernate 
+everything should be running
+2. Cloud / Production Kubernetes Deployment(AWS) - (it will actually host on cloud evry one can access it )
+
+
+
+1. Spring Boot application
+
+Java code + Maven
+
+2. Build JAR
+
+Create the executable application
+
+3. Build Docker image
+
+Package the JAR with its Java runtime
+
+4. Deploy to Kubernetes
+
+Deployment creates and manages Pods
+
+5. Expose the application
+
+Access it through a Kubernetes Service
+
+
+this is locally you don't need to run application locally you can access end points through postman 
+
+but when you close your machine then you will not able t access it that the called local deployment 
+
+so that we have to do claude deployment.
+
+
+###############################################################
+
+
+
+
+Here is your complete Java Spring Boot + Docker + Kubernetes deployment guide with commands and short descriptions. You can save this for future deployments.
+1. Project setup
+Navigate to your Product Service folder:
+cd "C:\Users\Admin\Desktop\E-commerce-Microservices\BitsAndBytes_Microservices\product-service"
+
+
+2. Configure Java 21
+Activate Java 21 for the current PowerShell session:
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+
+
+Verify Java:
+java -version
+javac -version
+
+
+3. Build Spring Boot application
+Generate the executable JAR:
+.\mvnw.cmd clean package -DskipTests
+
+
+Check the JAR:
+Get-ChildItem .\target\*.jar
+
+
+4. Create Dockerfile
+Create a Dockerfile in the Product Service root directory:
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY target/product-service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+Purpose: Packages your Spring Boot JAR with Java 21.
+5. Build Docker image
+docker build -t product-service:1.0 .
+
+
+Check the image:
+docker images product-service
+
+
+6. Start Kubernetes
+Make sure Docker Desktop and Kubernetes are running.
+kubectl get nodes
+
+
+Expected status: Ready.
+7. Deploy application to Kubernetes
+First-time deployment:
+kubectl create deployment product-service --image=product-service:1.0
+
+
+Check deployment:
+kubectl get deployments
+kubectl get pods
+
+
+Check application logs:
+kubectl logs deployment/product-service
+
+
+8. Configure Eureka
+In application.properties:
+spring.application.name=product-service
+server.port=8080
+
+spring.datasource.url=jdbc:h2:file:./data/producttestdb
+spring.datasource.username=sa
+spring.datasource.password=
+
+eureka.client.service-url.defaultZone=http://host.docker.internal:8761/eureka/
+eureka.instance.prefer-ip-address=true
+
+spring.jpa.hibernate.ddl-auto=update
+
+
+Purpose: Allows your Kubernetes Product Service to register with Eureka running on your Windows machine.
+9. Update deployment after code changes
+Whenever you modify Java code or configuration:
+
+Build JAR:
+.\mvnw.cmd clean package -DskipTests
+
+
+Build a new Docker image:
+docker build -t product-service:1.1 .
+
+
+Update Kubernetes:
+kubectl set image deployment/product-service product-service=product-service:1.1
+
+
+Verify rollout:
+kubectl rollout status deployment/product-service
+
+
+Use a new image tag for each update, such as 1.2, 1.3, etc.
+10. Access application using port forwarding
+Run:
+kubectl port-forward deployment/product-service 8081:8080
+
+
+Keep this terminal open.
+
+Your application is accessible at:
+http://localhost:8081
+
+
+11. Test API using Postman
+Your confirmed Product API endpoint:
+GET http://localhost:8081/products
+
+
+You can also test in PowerShell:
+Invoke-RestMethod http://localhost:8081/products
+
+
+If response is:
+[]
+
+
+It means the endpoint is responding successfully, but there are no products in the database.
+12. Useful Kubernetes commands
+Command	Purpose
+kubectl get nodes	Check cluster nodes
+kubectl get pods	Check running Pods
+kubectl get deployments	Check Deployments
+kubectl get services	Check Kubernetes Services
+kubectl describe pod <pod-name>	Inspect Pod details
+kubectl logs deployment/product-service	View application logs
+kubectl delete pod <pod-name>	Delete a Pod (Deployment recreates it)
+kubectl rollout restart deployment/product-service	Restart deployment
+kubectl rollout undo deployment/product-service	Roll back deployment
+kubectl delete deployment product-service	Delete deployment
+
+
+
+
+
+
+
+StartWrite Spring Boot ApplicationBuild JAR using MavenCreate Docker ImageDeploy to KubernetesRun Application in PodExpose Application using PortForwardTest APIDone
+
+#################################################################
+
+
+Steps to Deploy Spring Boot Application on Kubernetes
+1. Create Spring Boot Application – Develop your Product Service.
+2. Build JAR – Run Maven to generate the JAR file.
+3. Create Dockerfile – Define how to package your application.
+4. Build Docker Image – Create an image of your application.
+5. Start Kubernetes – Enable Kubernetes in Docker Desktop.
+6. Deploy Application – Create a Kubernetes Deployment.
+7. Run Pod – Kubernetes starts your application inside a Pod.
+8. Access Application – Use port forwarding to access the Pod.
+9. Test API – Verify your Product Service endpoint.
+
+
+
+
+
+
+
+
